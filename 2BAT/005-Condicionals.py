@@ -271,6 +271,26 @@ if es_negatiu:
 
 print(f'El nombre més gran possible és {nombre_mes_gran_possible}')
 
+
+# Una altra solució. Hem de saber que sorted() ordena un iterable.
+while True:
+    try:
+        nombre = int(input('Introduïx un nombre: ').strip())
+        cadena = str(abs(nombre))
+        if len(cadena) == 3:
+            break
+        print('Error: no té 3 digits')
+    except ValueError:
+        print('Error: no es un enter')
+
+nombre_mes_gran_possible = int(''.join(sorted(cadena, reverse=True)))
+
+if nombre < 0:
+    nombre_mes_gran_possible *= -1
+
+print(nombre_mes_gran_possible)
+
+
 # ----------
 # EXERCICI 8
 # ----------
