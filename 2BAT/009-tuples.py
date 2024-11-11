@@ -24,7 +24,7 @@
 # Nota (de moment): Si un objecte de longitud 0 s'avalua com a False.
 # 
 # llista = [ (1,3), (3,5,3), (), (7,2), (), (5,2,1), (45,)]
-# llista_nova = [element for element in llista if element]
+
 # print(llista_nova)
 
 #-----------
@@ -51,6 +51,40 @@ dades = {'t': [30, 35, 37, 38], 'p': [800, 900, 1200, 1800], 's': [2,4,6,8]}
 
 # tuples = [k for k in zip(*valors)]
 # print(tuples)
+
+# -----------------
+# Solució 2.1 sense empaquetar (desde llista auxiliar)
+#
+# llista = [element for element in dades.values()]
+# res = []
+# long = len(llista[0])
+# for i in range(long):
+#     res1 = [element[i] for element in llista]
+#     res.append(res1)
+
+# print(res)
+
+
+# -----------------
+# Solució 2.2 sense empaquetar (directament de dades)
+#
+# long = len(list(dades.values())[0])
+# res = []
+# for i in range(long):
+#     res1 = [element[i] for element in dades.values()]
+#     res.append(res1)
+
+
+# -----------------
+# Solucio 3
+# n = len(next(iter(dades.values())))
+# n = len(list(dades.values())[0])
+
+# res = [[] for _ in range(n)]
+
+# for valors in dades.values():
+#     for i,element in enumerate(valors):
+#         res[i].append(element)
 
 
 #-----------
