@@ -368,15 +368,121 @@
 
 # De manera recursiva
 
-def f(i,ant):
-    if i==0:
-        print(ant)
-        return
-    for x in 'ABCD':
-        f(i-1,ant+x)
+# def f(i,ant):
+#     if i==0:
+#         print(ant)
+#         return
+#     for x in 'ABCD':
+#         f(i-1,ant+x)
 
-for i in range(1,4):
-    f(i,'')
+# for i in range(1,4):
+#     f(i,'')
+
+
+# --------------------------------------------------------------------------------------------
+# Exercici de llistes de llistes
+# --------------------------------------------------------------------------------------------
+# Diferents maneres de sumar els element d'una llista.
+
+llista =  [ [1,2,3,4],
+          [5,6,7,8],
+          [9,10,11,12]
+        ]
+
+# 1 ---------
+s = 0
+for row in llista:
+    for element in row:
+        s += element     
+print(s)
+
+# 2 ---------
+s = 0
+for row in zip(*llista):
+    s += sum(row)
+print(s)
+
+# 3 --------- a partir de 1)
+s = sum([element for row in llista for element in row])
+print(s)
+
+
+# 4 --------- a partir de 2)
+s = 0
+s =sum([sum(row) for row in zip(*list)])
+print(s)
+
+
+# 5 --------- Vore explicació de sum després:
+b = sum(sum(llista,[]))
+print(b)
+
+
+# ---------------------------
+# FUNCIONAMENT DE SUM:
+# ---------------------------
+
+# Fer:
+nombres = [1,2,3,4]
+b = sum(nombres,1)
+print(b)
+
+#equival a:
+suma = 1
+for element in nombres:
+    suma = suma + element
+print(suma)
+
+
+# Fer:
+nombres:list[int] =  [ [1,2,3,4],
+                       [5,6,7,8],
+                       [9,10,11,12]]
+        
+b = sum(nombres,[])
+print(b)
+
+#equival a:
+suma2:list[int] = []
+for element in nombres:
+    suma2 = suma2 + element
+print(suma2)
+
+# Altres opcions de sum:
+dades = [{"valor": 10}, {"valor": 20}, {"valor": 30}]
+resultat1 = sum(d["valor"] for d in dades)
+print(resultat1)
+
+# Suma les longitud de llistes
+llistes = [[1, 2, 3], [4, 5], [6, 7, 8, 9]]
+resultat = sum(len(fila) for fila in llistes)
+print(resultat)
+
+# Suma els nombres parells
+nombres2 = [1, 2, 3, 4, 5, 6]
+resultat = sum(x for x in nombres2 if x % 2 == 0)  # Només parells
+print(resultat) 
+
+# ---------------------------
+
+
+def aplanar_iteratiu(llista):
+    resultat = []
+    pila = list(llista)  # Creem una còpia de la llista com a pila
+    while pila:
+        element = pila.pop(0)  # Agafem el primer element
+        if isinstance(element, list):
+            pila = element + pila  # Afegim els seus elements al començament de la pila
+        else:
+            resultat.append(element)
+    return resultat
+
+a = [[1, 3, 4, 4], [[1, 3], [5, 6, 7]]]
+aplanada = aplanar_iteratiu(a)
+print(aplanada)  # Output: [1, 3, 4, 4, 1, 3, 5, 6, 7]
+
+
+
 
 
 
