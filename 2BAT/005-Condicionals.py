@@ -180,6 +180,10 @@ elif (costat1 == costat2) or (costat1 == costat3) or (costat2 == costat3):
     print('Triangle isòsceles')
 else:
     print('Triangle escalè')
+     
+# Opció B. Hem de saber que sorted() ordena un iterable.
+# costat1, costat2, costat3 = sorted([costat1, costat2, costat3],reverse=True)
+# suma_costats_menors: float = costat2 + costat3
 
 # ----------
 # EXERCICI 6

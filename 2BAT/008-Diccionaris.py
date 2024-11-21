@@ -68,6 +68,10 @@ for x in range(1,11):
 #     resultat *= diccionari[clau]
 
 
+# Solució 3
+# import math
+# print(math.prod(diccionari.values()))
+
 #-------------
 # EXERCICI 3
 #-------------
@@ -177,6 +181,18 @@ for x in range(1,11):
 # alumnes=160
 # grups=5
 
+# -----------
+# Solució 1
+# -----------
+# for nivell in ies:
+#     print(f'--- {nivell} ---')
+#     for k,v in ies[nivell].items():
+#         print(f'{k}={v}')
+
+
+# -----------
+# Solució 2
+# -----------
 # for nivell in ies:
 #     print(f'--- {nivell} ---')
 #     for dades in ies[nivell]:
@@ -219,7 +235,7 @@ for x in range(1,11):
 #-------------
 # Solució 1
 # # Crear un diccionari que a partir d'un string indique el nombre de vegades que apareix cada lletra.
-# str = 'AABCCC5'
+# str = 'AABCCC5'           # Resultat: {'A': 2, 'B': 1, 'C': 3, '5': 1}
 # diccionari:dict = {}
 # for lletra in str:
 #     diccionari[lletra] = diccionari.get(lletra, 0 ) + 1
@@ -236,6 +252,13 @@ for x in range(1,11):
 #         diccionari[lletra] = diccionari[lletra] + 1
 # print(diccionari)
 
+# Solució 3
+# str = 'AABCCC5'
+# diccionari:dict = {}
+# for x in str:   
+#     diccionari[x] = 1 if x not in diccionari else diccionari[x]+1
+
+# ========   count
 
 #-------------
 # EXERCICI 9
@@ -262,9 +285,23 @@ for x in range(1,11):
 #         diccionari[nom].append(distancia)
 # print(diccionari)
 
+# Solució 3
+# llista = [('Pere', 7.8), ('Carles', 7.7), ('David', 7.9), ('Carles', 7.8), ('Carles', 7.7), ('David', 7.8)]
+# diccionari:dict = {}
+# diccionari.update(llista)
+# for nom in diccionari:
+#     diccionari[nom] = [v for k,v in llista if k==nom]
+# print(diccionari)
 
+# Solució 4 (amb conjunts)
+# dades:list = [('Pere', 7.8), ('Carles', 7.7), ('David', 7.9), ('Carles', 7.8), ('Carles', 7.7), ('David', 7.8)]
+# diccionari:dict = {}
 
+# conjunt = {nom for nom, _ in dades}
 
+# for nom in conjunt:
+#     diccionari[nom] = [v for k,v in dades if k==nom]
+# print(diccionari)
 
 
 #-------------

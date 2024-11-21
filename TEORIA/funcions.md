@@ -18,8 +18,9 @@ print(enter)        # 10
 
 Els objectes poden ser:
 
-* __Mutables__: poden ser modificats una vegada creats. Són: _list, dict, set, classes definides pel programador,  bytearray, memoryview_.
-* __Immutables__: no es poden modificar una vegada creats. Són: _bool, int, float, string, tuple, range, complex, byte, frozenset_.
+* __Mutables__: Poden ser modificats una vegada creats. Són: _list, dict, set, classes definides pel programador,  bytearray, memoryview_. Corresponen als tipus de dades compostos. Quan passem un tipus immutable a una funció, la variable creada fa referència a l'objete original i qualsevol canvi dins de la funció modificarà este objecte original, encara que estiga fora de la funció. Tradicionalment correspon al passe de paràmentres per referència.
+
+* __Immutables__: No es poden modificar una vegada creats. Són: _bool, int, float, string, tuple, range, complex, byte, frozenset_. Si volem modificar el seu contingut s'ha de crear un objecte. Corresponen a tipus de dades bàsics. Quan passem un tipus immutable a una funció es crea variable que és còpia de l'original. Qualsevol canvi es fa sobre la copia de dins de la funció i no afecta a l'objecte original de fora de la funció. Tradicionalment correspon al passe de paràmentres per valor.
 
 ```python
 -- EXEMPLES AMB TIPUS IMMUTABLES --
@@ -32,6 +33,7 @@ s = s + '-siau' # id(s)=41855344. s apunta un nou string amb valor 'adeu-siau'
 ```
 
 ```python
+-- EXEMPLES AMB TIPUS MUTABLES --
 v = [1, 2, 3]
 d = { 'un':1,'dos':2 }
 
@@ -92,18 +94,23 @@ f()				# a=10 	id(a)=9789280
 ```
 
 ### Modificador __global__
-Com a mecanisme de seguretat, des de dins d’una funció no podem canviar una variable global. Si volem fer-ho utilitzarem el modificador __global__.
+__global__ permet treballar directament amb la referència de la variable global dins de la funció, evitant que crear una variable local.
 
 ```python
+# Amb dades immutables canvie la referència exterta de b
 b = 10			# b=10 	id(b)=9789280
 
 def h():
     global b
     b = 5		# b=5 	id(b)=9789120
 
-h()				# b=5 	id(b)=9789120
-b = 6			# b=6 	id(b)=9789152
+h()				
+
+print(b)        # id(b)=9789120
+
 ```
+
+
 
 
 ## PASSE D'ARGUMENTS
