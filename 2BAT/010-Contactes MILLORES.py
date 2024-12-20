@@ -8,6 +8,8 @@ LINE_DOWN = '\033[1E'
 
 etiquetes: list[str] = ['nom', 'telefon']
 contactes: list[dict[str, str]] = []
+contactes_filtrats: list[tuple[int,dict[str, str]]] = []
+
 filtre_contactes: str = ''
 nom_arxiu = 'contactes.pkl'
 
@@ -32,8 +34,7 @@ def mostra_menu(text: str, valors_valids: str, missatge_abans_input = '') -> str
         if opcio in valors_valids:
             return opcio
         missatge_abans_input = LINE_UP + 'Error, opció incorrecta'
-
-
+        
 # --------------------------------------------------------------------------------------------
 def input_int(text: str, maxim_enter: int) -> int|None:
     """Fa un input(text). Admet i retorna valors enters entre [0, maxim].
@@ -87,13 +88,23 @@ def mostra_la_llista_etiquetes():
 
 
 # --------------------------------------------------------------------------------------------
-def filtra_els_contactes() -> list[dict[str, str]]:
-    """Retorna una llista dels contactes que complixen amb filtre_contactes.
-    """
+def filtra_els_contactes2() -> list[dict[str, str]]:
+    """Retorna una llista dels contactes que complixen amb filtre_contactes."""
+    
     if filtre_contactes == '':
         return contactes
 
     return [contacte for contacte in contactes if [
+        valor for valor in contacte.values() if filtre_contactes in valor]]
+
+
+def filtra_els_contactes() -> list[tuple[int,dict[str, str]]]:
+    """Retorna una llista dels contactes que complixen amb filtre_contactes."""
+    
+    if filtre_contactes == '':
+        return [ (i,contacte) for i, contacte in enumerate(contactes)]
+
+    return [(i,contacte) for i, contacte in enumerate(contactes) if [
         valor for valor in contacte.values() if filtre_contactes in valor]]
 
 
@@ -116,25 +127,28 @@ def mostra_la_de_llista_contactes():
         print('\n- No hi ha contactes -')
         return
 
-    for n, contacte in enumerate(contactes_filtrats):
+    # for n, contacte in enumerate(contactes_filtrats):
+    #     print(f"({n})- ", end='')
+    #     for k,v in contacte.items():
+    #         print(f'{k}:{v}, ', end='')
+    #     print('')
+    
+    for n, contacte in contactes_filtrats:
         print(f"({n})- ", end='')
         for k,v in contacte.items():
             print(f'{k}:{v}, ', end='')
         print('')
 
 # --------------------------------------------------------------------------------------------
-def canvia_etiqueta_en_tots_els_contactes(etiqueta_antiga:str, etiqueta_nova:str) -> list[dict[str, str]]:
-    
-    contactes_nous: list[dict[str, str]] = []
-
-    for contacte in contactes:
-        contacte_nou: dict[str, str] = {}
-        for etiqueta,valor in contacte.items():
-            etq = etiqueta_nova if etiqueta == etiqueta_antiga else etiqueta
-            contacte_nou[etq]=valor
-        contactes_nous.append(contacte_nou)
+def canvia_etiqueta_en_tots_els_contactes(etiqueta_antiga:str, etiqueta_nova:str) -> None:
+    for i,contacte in enumerate(contactes):
+        if etiqueta_antiga in contacte:
+            contacte_nou: dict[str, str] = {}
+            for etiqueta,valor in contacte.items():
+                etq = etiqueta_nova if etiqueta == etiqueta_antiga else etiqueta
+                contacte_nou[etq]=valor
+            contactes[i] = contacte_nou
             
-    return contactes_nous
   
 # --------------------------------------------------------------------------------------------
 def esta_en_us(etiqueta) -> bool:
@@ -155,6 +169,8 @@ def gestiona_les_etiquetes() -> None:
         Esborra_la_terminal()
         
         mostra_la_llista_etiquetes()
+        
+        print(msg_error)
         
         opcio = mostra_menu(text='(C)rea, (E)sborra, (M)odifica? ', valors_valids='CEM', missatge_abans_input=msg_error)
         
@@ -190,8 +206,8 @@ def gestiona_les_etiquetes() -> None:
             
         elif opcio == 'M':
             posicio = input_int(text='Etiqueta a modificar? ', maxim_enter=len(etiquetes))
-            
-            if not posicio:
+
+            if posicio is None:
                 continue
             
             etiqueta = input(LINE_CLEAR + "Nou nom de l'etiqueta: ").lower()
@@ -205,7 +221,7 @@ def gestiona_les_etiquetes() -> None:
                 continue
             
             global contactes
-            contactes = canvia_etiqueta_en_tots_els_contactes(etiqueta_antiga=etiquetes[posicio], etiqueta_nova=etiqueta)
+            canvia_etiqueta_en_tots_els_contactes(etiqueta_antiga=etiquetes[posicio], etiqueta_nova=etiqueta)
             etiquetes[posicio] = etiqueta
         
         grava_en_disc()
