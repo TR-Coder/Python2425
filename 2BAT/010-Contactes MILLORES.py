@@ -1,6 +1,7 @@
 import os
 import platform
 import pickle
+from collections import OrderedDict
 
 LINE_UP = '\033[1F'
 LINE_CLEAR = '\x1b[2K'
@@ -25,7 +26,7 @@ def mostra_menu(text: str, valors_valids: str, missatge_abans_input = '') -> str
     """Fa un input(text) que admet només un caràcter. Este caracter ha de coincidir amb un
     dels caràcters en 'valors_valids'. Si no coincidix mostra el missagte de 'Error, opció incorrecta'.
     Si coincidix retorna el caràcter introduit. Addicionalment, permet mostrar el text 'missatge_abans_input'
-    abans de mostrar fer l'input.
+    abans de l'input.
     """
     print()
     while True:
@@ -36,15 +37,16 @@ def mostra_menu(text: str, valors_valids: str, missatge_abans_input = '') -> str
         missatge_abans_input = LINE_UP + 'Error, opció incorrecta'
         
 # --------------------------------------------------------------------------------------------
-def input_int(text: str, maxim_enter: int) -> int|None:
-    """Fa un input(text). Admet i retorna valors enters entre [0, maxim].
-        Si el valor introduït no és un enter o esta fora del rang [0,maxim] mostra
+def input_int(text: str, maxim_enter: int, missatge_abans_input = '') -> int|None:
+    """Fa un input(text). Admet i retorna valors enters entre [0, maxim_enter).
+        Si el valor introduït no és un enter o esta fora del rang [0,maxim_enter) mostra
         el missatge d'error 'valor fora de rang' o 'valor incorrecte'.
-        Retorna -1 si polsem Intro.
+        Retorna None si polsem Intro.
     """
     while True:
         try:
-            opcio: str = input(LINE_CLEAR + text)
+            print(LINE_DOWN + missatge_abans_input, end='')
+            opcio:str = input(LINE_UP + LINE_CLEAR + text)
             
             if opcio.strip() == '':
                 return None
@@ -52,31 +54,31 @@ def input_int(text: str, maxim_enter: int) -> int|None:
             if 0 <= int(opcio) < maxim_enter:
                 return int(opcio)
             
-            print(LINE_CLEAR + 'Error, valor fora de rang' + LINE_UP, end=LINE_CLEAR)
+            missatge_abans_input = LINE_UP + 'Error, valor fora de rang'
             
         except ValueError:
-            print(LINE_CLEAR + 'Error, valor incorrecte' + LINE_UP, end=LINE_CLEAR)
+            missatge_abans_input = LINE_UP + 'Error, valor incorrecte'
 
 
 # --------------------------------------------------------------------------------------------
 def mostra_el_menu_principal() -> str:
-    """Mostra el menú principal i retorna l'opció seleccionada.
-       Les opcions són: 1-Contactes i 2-Etiquetes.
+    """Mostra el menú principal i retorna l'opció seleccionada. Les opcions són: 1-Contactes i 2-Etiquetes.
     """   
     print('- MENÚ PRINCIPAL -')
     print('1- Contactes')
     print('2- Etiquetes')
-    
-    return mostra_menu(text='Opció? ', valors_valids='12')
+    opcio = mostra_menu(text='Opció? ', valors_valids='12')    
+    return opcio
 
 
 # --------------------------------------------------------------------------------------------
-def mostra_la_llista_etiquetes():
+def mostra_la_llista_detiquetes():
     """Mostra la llista de les etiquetes. Si no n'hi ha etiquetas mostra: -- No hi ha etiquetes ---
        El format de l'eixida és:
        - LLISTA D'ETIQUETES -
         (n)- nom de la etiqueta.    on n indica la posició dins de la llista.
     """
+
     print("- LLISTA D'ETIQUETES -")
 
     if not etiquetes:
@@ -84,33 +86,26 @@ def mostra_la_llista_etiquetes():
         return
 
     for n, etiqueta in enumerate(etiquetes):
-        print(f'({n})- {etiqueta.capitalize()}')
+        print(f'({n})- {etiqueta}')
 
 
 # --------------------------------------------------------------------------------------------
-def filtra_els_contactes2() -> list[dict[str, str]]:
-    """Retorna una llista dels contactes que complixen amb filtre_contactes."""
-    
-    if filtre_contactes == '':
-        return contactes
-
-    return [contacte for contacte in contactes if [
-        valor for valor in contacte.values() if filtre_contactes in valor]]
-
-
 def filtra_els_contactes() -> list[tuple[int,dict[str, str]]]:
     """Retorna una llista dels contactes que complixen amb filtre_contactes."""
-    
-    if filtre_contactes == '':
-        return [ (i,contacte) for i, contacte in enumerate(contactes)]
-
     return [(i,contacte) for i, contacte in enumerate(contactes) if [
         valor for valor in contacte.values() if filtre_contactes in valor]]
 
 
 # --------------------------------------------------------------------------------------------
+def està_en_filtres_contactes(posicio:int) -> bool:
+    for n,_ in contactes_filtrats:
+        if n == posicio:
+            return True
+    return False
+
+# --------------------------------------------------------------------------------------------
 def mostra_la_de_llista_contactes():
-    """Mostra per pantalla la llita de contactes. Mostra també el filtre aplicat.
+    """Mostra per pantalla la llista de contactes. Mostra també el filtre aplicat.
         Si no hi ha contactes indica -- No hi ha contactes --.
         El format de l'eixida és:
         - LLISTA DE CONTACTES - Filtre:
@@ -121,17 +116,15 @@ def mostra_la_de_llista_contactes():
     print(f'- LLISTA DE CONTACTES - Filtre: {filtre_contactes}')
     print('==============================================')
 
-    contactes_filtrats = filtra_els_contactes()
+
+    if filtre_contactes == '':
+        contactes_filtrats = list(enumerate(contactes))
+    else:
+        contactes_filtrats = filtra_els_contactes()
 
     if not contactes_filtrats:
         print('\n- No hi ha contactes -')
         return
-
-    # for n, contacte in enumerate(contactes_filtrats):
-    #     print(f"({n})- ", end='')
-    #     for k,v in contacte.items():
-    #         print(f'{k}:{v}, ', end='')
-    #     print('')
     
     for n, contacte in contactes_filtrats:
         print(f"({n})- ", end='')
@@ -140,15 +133,19 @@ def mostra_la_de_llista_contactes():
         print('')
 
 # --------------------------------------------------------------------------------------------
+# Com volem mantrindre l'ordre no farem un:
+# valor = contacte.pop(etiqueta_antiga)
+# contacte[etiqueta_nova] = valor
+# perquè col·locaria l'etiqueta en l´última posició i nosaltre volem mantindre la posició.
+#
 def canvia_etiqueta_en_tots_els_contactes(etiqueta_antiga:str, etiqueta_nova:str) -> None:
     for i,contacte in enumerate(contactes):
-        if etiqueta_antiga in contacte:
+        if etiqueta_antiga in contacte:             # 'in' busca en les claus del diccionari.
             contacte_nou: dict[str, str] = {}
             for etiqueta,valor in contacte.items():
                 etq = etiqueta_nova if etiqueta == etiqueta_antiga else etiqueta
                 contacte_nou[etq]=valor
             contactes[i] = contacte_nou
-            
   
 # --------------------------------------------------------------------------------------------
 def esta_en_us(etiqueta) -> bool:
@@ -168,9 +165,9 @@ def gestiona_les_etiquetes() -> None:
     while True:
         Esborra_la_terminal()
         
-        mostra_la_llista_etiquetes()
+        mostra_la_llista_detiquetes()
         
-        print(msg_error)
+        # print(msg_error)
         
         opcio = mostra_menu(text='(C)rea, (E)sborra, (M)odifica? ', valors_valids='CEM', missatge_abans_input=msg_error)
         
@@ -210,7 +207,7 @@ def gestiona_les_etiquetes() -> None:
             if posicio is None:
                 continue
             
-            etiqueta = input(LINE_CLEAR + "Nou nom de l'etiqueta: ").lower()
+            etiqueta = input(LINE_CLEAR + "Nou nom de l'etiqueta: ")
             
             if etiqueta in etiquetes:
                 msg_error =  "Error, l'etiqueta ja existix"
@@ -228,30 +225,34 @@ def gestiona_les_etiquetes() -> None:
 
 # --------------------------------------------------------------------------------------------
 def demana_llista_etiquetes_contacte() -> list[int]:
-    """ Pregunta a l'usuari les etiquetes que volem aplicar a un contacte. Retorna una llista amb el nombre de cadascuna
-    d'este etiquetes, per exemple [0,2]. Elimina les duplicitats [2,2] és [2]. Retorna la llista en ordre.
+    """ Pregunta a l'usuari les etiquetes que volem aplicar a un contacte quan el creem.
+    Retorna una llista amb el nombre de cadascuna d'este etiquetes, per exemple [0,2].
+    Elimina les duplicitats [2,2] és [2]. Retorna la llista en ordre.
     """
     while True:
         
-        etiquetes_aplicar: str = input(LINE_CLEAR + 'Indica les etiquetes a aplicar (Intro totes)? ')
+        etiquetes_aplicar: str = input(LINE_CLEAR + 'Indica les etiquetes a aplicar (Intro totes)? ').strip()
+             
+        if not etiquetes_aplicar:                   # Polsar intro indica que volem aplicar totes les etiquetes.
+            return list(range(len(etiquetes)))      # Retornem una llista amb la numeració de totes les etiquetes. Exemple: [0,1,2,3,4].
         
-        # Polsar intro indica que volem aplicar totes les etiquetes. Retornarem una llista amb la numeració
-        # de totes les etiquetes, per explemple [0,1,2,3,4].
-        if not etiquetes_aplicar.strip():
-            return list(range(len(etiquetes)))
-        
-        conjunt = set()     # Creem un conjunt per a eliminar possibles duplicitats.
-        
-        try:
-            for item in list(etiquetes_aplicar):
-                if int(item) < 0 or int(item) >= len(etiquetes):
-                    print(LINE_CLEAR + 'Error, etiqueta fora de límit' + LINE_UP, end=LINE_CLEAR)
-                    break
-                conjunt.add(int(item))
-            else:
-                return(sorted(conjunt))
-        except:
+        if not etiquetes_aplicar.isdigit():
             print(LINE_CLEAR + 'Etiqueta incorrecta' + LINE_UP, end=LINE_CLEAR)
+            continue
+        
+        conjunt = set(etiquetes_aplicar)            # Creem un conjunt per a eliminar possibles duplicitats.
+        llista_enters = list(map(int, conjunt))     # map() aplica una funció a cadascun dels elements d'un iterable 
+                                                    # i retorna un nou iterable amb els resultats.
+        
+        # all() recorre un iterable i retorna true si tots   els seus elements són true.
+        # any() recorre un iterable i retorna true si algun dels seus elements és true.
+        if not all (0 <= num < len(etiquetes) for num in llista_enters):      
+            print(LINE_CLEAR + 'Error, etiqueta fora de límit' + LINE_UP, end=LINE_CLEAR)
+            continue
+
+        llista_enters.sort()        # ordenem la llista perquè pregunte les etiques per ordre.
+
+        return llista_enters
 
 
 # --------------------------------------------------------------------------------------------
@@ -262,7 +263,7 @@ def crea_un_contacte() -> None:
     contacte: dict[str, str] = {}       # Nou contacte
     
     print()
-    mostra_la_llista_etiquetes()
+    mostra_la_llista_detiquetes()
     
     llista_etiquetes: list[int] = demana_llista_etiquetes_contacte()
     
@@ -273,18 +274,35 @@ def crea_un_contacte() -> None:
 
     contactes.append(contacte)
 
+
 # --------------------------------------------------------------------------------------------
-def modifica_el_contacte(posicio: int):
+def modifica_el_contacte(posicio: int) -> None:
     """Modifica el contacte situat en posicio. Recorre les etiquetes i demana un nou valor.
         Si polsem Intro no modifica el seu valor i passa a la següent etiqueta.
     """
     print(LINE_CLEAR, end='')
     contacte = contactes[posicio]
-    for clau in contacte.keys():
+    for clau in etiquetes:
         valor = input(LINE_CLEAR + f'{clau}? ')
         if valor != '':
             contacte[clau] = valor
+   
+# --------------------------------------------------------------------------------------------
+def esborra_un_contacte() -> None:
 
+    msg_error = ''    
+    while True:
+        posicio: int|None = input_int(text='Contacte a esborrar? ', maxim_enter=len(contactes), missatge_abans_input=msg_error)
+
+        if posicio is None:
+            return
+        
+        if not està_en_filtres_contactes(posicio):
+            msg_error = 'Error, el contacte no està en la selecció filtrada'
+            continue
+
+        contactes.pop(posicio)
+        return
 
 # --------------------------------------------------------------------------------------------
 def gestiona_els_contactes() -> None:
@@ -304,15 +322,11 @@ def gestiona_els_contactes() -> None:
             crea_un_contacte()
             
         elif opcio == 'E':
-            posicio: int|None = input_int(text='Contacte a esborrar? ', maxim_enter=len(contactes))
-            if not posicio:
-                continue
-            contactes.pop(posicio)
-            
+            esborra_un_contacte()
+           
         elif opcio == 'M':
             posicio = input_int(text='Contacte a modificar? ', maxim_enter=len(contactes))
-            
-            if not posicio:
+            if posicio is None:
                 continue
             
             modifica_el_contacte(posicio)
