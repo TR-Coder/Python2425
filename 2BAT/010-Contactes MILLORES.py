@@ -1,7 +1,7 @@
 import os
 import platform
 import pickle
-from collections import OrderedDict
+# from collections import OrderedDict
 
 LINE_UP = '\033[1F'
 LINE_CLEAR = '\x1b[2K'
@@ -37,16 +37,17 @@ def mostra_menu(text: str, valors_valids: str, missatge_abans_input = '') -> str
         missatge_abans_input = LINE_UP + 'Error, opció incorrecta'
         
 # --------------------------------------------------------------------------------------------
-def input_int(text: str, maxim_enter: int, missatge_abans_input = '') -> int|None:
+def input_int(text: str, maxim_enter: int) -> int|None:
     """Fa un input(text). Admet i retorna valors enters entre [0, maxim_enter).
         Si el valor introduït no és un enter o esta fora del rang [0,maxim_enter) mostra
         el missatge d'error 'valor fora de rang' o 'valor incorrecte'.
         Retorna None si polsem Intro.
     """
+    
+    print()
     while True:
         try:
-            print(LINE_DOWN + missatge_abans_input, end='')
-            opcio:str = input(LINE_UP + LINE_CLEAR + text)
+            opcio:str = input(LINE_CLEAR + text)
             
             if opcio.strip() == '':
                 return None
@@ -54,10 +55,10 @@ def input_int(text: str, maxim_enter: int, missatge_abans_input = '') -> int|Non
             if 0 <= int(opcio) < maxim_enter:
                 return int(opcio)
             
-            missatge_abans_input = LINE_UP + 'Error, valor fora de rang'
+            print('Error, valor fora de rang' + LINE_UP, end='')
             
         except ValueError:
-            missatge_abans_input = LINE_UP + 'Error, valor incorrecte'
+            print('Error, valor incorrecte' + LINE_UP, end='')
 
 
 # --------------------------------------------------------------------------------------------
@@ -98,10 +99,11 @@ def filtra_els_contactes() -> list[tuple[int,dict[str, str]]]:
 
 # --------------------------------------------------------------------------------------------
 def està_en_filtres_contactes(posicio:int) -> bool:
-    for n,_ in contactes_filtrats:
-        if n == posicio:
-            return True
-    return False
+    return any(n == posicio for n, _ in contactes_filtrats)
+    # for n,_ in contactes_filtrats:
+    #     if n == posicio:
+    #         return True
+    # return False
 
 # --------------------------------------------------------------------------------------------
 def mostra_la_de_llista_contactes():
@@ -116,7 +118,7 @@ def mostra_la_de_llista_contactes():
     print(f'- LLISTA DE CONTACTES - Filtre: {filtre_contactes}')
     print('==============================================')
 
-
+    global contactes_filtrats
     if filtre_contactes == '':
         contactes_filtrats = list(enumerate(contactes))
     else:
@@ -149,11 +151,11 @@ def canvia_etiqueta_en_tots_els_contactes(etiqueta_antiga:str, etiqueta_nova:str
   
 # --------------------------------------------------------------------------------------------
 def esta_en_us(etiqueta) -> bool:
-    for contacte in contactes:
-        for etiqueta_contacte in contacte:
-            if etiqueta_contacte == etiqueta:
-                return True
-    return False
+    # for contacte in contactes:
+    #     if etiqueta in contacte:
+    #       return True
+    # return False
+    return any(etiqueta in contacte for contacte in contactes)
 
 # --------------------------------------------------------------------------------------------
 def gestiona_les_etiquetes() -> None:
@@ -192,7 +194,7 @@ def gestiona_les_etiquetes() -> None:
         elif opcio == 'E':
             posicio:int|None = input_int('Etiqueta a esborrar? ', maxim_enter=len(etiquetes))
             
-            if not posicio:
+            if posicio is None:
                 continue
             
             if esta_en_us(etiqueta=etiquetes[posicio]):
@@ -292,13 +294,13 @@ def esborra_un_contacte() -> None:
 
     msg_error = ''    
     while True:
-        posicio: int|None = input_int(text='Contacte a esborrar? ', maxim_enter=len(contactes), missatge_abans_input=msg_error)
+        posicio: int|None = input_int(text='Contacte a esborrar? ', maxim_enter=len(contactes))
 
         if posicio is None:
             return
         
         if not està_en_filtres_contactes(posicio):
-            msg_error = 'Error, el contacte no està en la selecció filtrada'
+            print('Error, el contacte no està en la selecció filtrada')
             continue
 
         contactes.pop(posicio)
