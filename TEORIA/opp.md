@@ -1,3 +1,10 @@
+# Introducció
+De moment hem aprés a programar d'una manera estrucutrada però sense aplicar cap metodologia en particular. Disposem d'unes eines que el Python proporciona i hem aprés a utilitzar-les encara que no d'una manera conjunta per a resoldre problemes. La OPP proporciona un conjunt d'estratègies per a crear la millor solució per a resoldre un problema.
+
+Amb programes xicotes la programació seqüèncial que hem estudiat es suficient però esdevé inmanejable davant programes grans. Es tractar de buscar un paradigma que permeta estructurar el codi d'una manera senzilla, que siga escalable, mantenible, que facilite la lectura, la depuració, la correcció d'errors, etc. Ací és on entra en joc la POO.
+
+En POO un objecte és una entitat abstracta que representa un objecte del món real.  
+
 # Conceptes programació orientada a objectes (OPP)
 
 Entendre, mantindre i actualitzar un programa format per una gran col·lecció de funcions és díficil.
@@ -46,7 +53,7 @@ En alguns llenguatges es permet l'herència múltiple (com Python) que permet cr
 
 
 ## Polimorfisme
-En una herència de classes diferents classes poden tindre un mètodes amb el mateix nom però que fan operacions diferents. Cridar a un mètode o un altre depen de l'objecte amb què invoquen el mètode.
+En una herència de classes diferents classes poden tindre un mètode amb el mateix nom però que fan operacions diferents. Cridar a un mètode o un altre depen de l'objecte amb què invoquen el mètode.
 
 
 # POO en Python
