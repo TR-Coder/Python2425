@@ -27,8 +27,10 @@ assert x <= 5, 'La condició es False'			# AssertionError: La condició és Fals
 ```
 
 
-El mètode \_\_init\_\_() d'Exception accepta arguments *args, el que implica que podem passar-li qualsevol nombre d'arguments.
-Si assignem l'excepció a una variable podrem recuperar-los amb .args
+El mètode \_\_init\_\_() d'Exception accepta arguments *args, el que implica que podem passar-li qualsevol nombre d'arguments. Excepction té l'atribut args, el qual és una tupla amb les arguments que hem passat al
+constructor de l'excepció.
+
+Si assignem l'excepció a una variable podrem recuperar-los amb .args:
 
 ```python		
 try:
@@ -36,6 +38,9 @@ try:
 except ValueError as ex:
     a,b,c = ex.args             # 'The value error exception', 1, 2.0
 ```
+
+Si volem imprimir directament tots els arguments podem fer:
+print(ex.args), o directament print(ex) ja que el __str__() de les excepcions està definit així.
 
 ##  Excepcions personalitzades
 Per a crear una excepció personalitzada deriven d'Exception. També podem passar-li qualsevol nombre d'arguments.
@@ -91,7 +96,25 @@ except:
     exit()
 ```
 
-Podem capturar més d'una excepció en la mateixa clausula except. Hem de posar les possibles excepcions en una tupla.
+Si volem capturar una excepció inesperada, enlloc d'un simple "except :" possarem un "except Exception as err:".
+Normalment per a gestionar este Exception s'imprimix o registra l'excepció i es rellança per a permetre que qui crida la funció puga manejar-la.
+Exemple:
+```python
+try:
+    pass
+except OSError as err:
+    print("OS error:", err)
+except ValueError:
+    print("Could not convert data to an integer.")
+except Exception as err:
+    print(f"Unexpected {err=}, {type(err)=}")
+    raise
+```
+
+El patrón más común para gestionar Exception es imprimir o registrar la excepción y luego volver a re-lanzarla (permitiendo a un llamador manejar la excepción también):
+
+
+Podem capturar més d'una excepció en la mateixa clausula except (Només pot hi haver una excepció activa.). Hem de posar les possibles excepcions en una tupla. 
 ```python
 number = 0
 try:
@@ -154,7 +177,7 @@ try:
     a / b
 except ZeroDivisionError as ex:
     print('Logging exception:', str(ex))
-    raise
+    raise ex                                # posar 'ex' mostra la pila de cridades (traceback).
 ```
 
 Podem llançar un altre tipus d'excepció durant el maneig d'una excepció.
@@ -237,4 +260,50 @@ Generarà:
             c = a / b
         ZeroDivisionError: division by zero
         [Finished in 0.2s]
+
+
+Analitzem la traça de cridades de l'exepció del següent programa:
+
+```python
+1 def func1():
+2    raise ValueError("Error original en func1")
+3
+4 def func2():
+5    try:
+6        func1()
+7    except ValueError as e:
+8        e.add_note("S'ha produït un error durant l'execució de func2") # add_note() afegix informació a una excepció.
+9        raise e
+10 func2()
+```
+
+L'error generat és:
+
+    ERROR!
+    Traceback (most recent call last):
+    File "<main.py>", line 10, in <module>
+    File "<main.py>", line 9, in func2                      <- Apareix perquè hem posat "raise e"
+    File "<main.py>", line 6, in func2
+    File "<main.py>", line 2, in func1
+    ValueError: Error original en func1
+    S'ha produït un error durant l'execució de func2.       <- add_note()
+
+
+
+# import traceback
+
+try:
+    func2()
+except Exception as e:
+    print(e.__traceback__)
+    import traceback
+    traceback.print_exception(type(e), e, e.__traceback__)
+
+https://www.qodo.ai/blog/6-best-practices-for-python-exception-handling/
+https://docs.python.org/3/reference/simple_stmts.html#raise
+https://realpython.com/python-lbyl-vs-eafp/
+https://realpython.com/python-raise-exception/
+
+
+
 
