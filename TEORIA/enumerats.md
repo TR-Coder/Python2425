@@ -1,4 +1,6 @@
 https://realpython.com/python-enum/
+https://docs.python.org/3/howto/enum.html#enum-class-differences
+
 
 # Enumerats
 Un enumerat, o un enum, és un conjunt de constants relacionades entre elles que s'accedixen a través del propi enum.
@@ -24,45 +26,39 @@ class Day(Enum):
     DIVENDRES = 5
     DISSABTE = 6
     DIUMENGE = 7
-
-# Cada membre de l'enum es declara amb majúscules i els valor de cada membre és una constant.
-
-# Podem accedir a l'enumerat com:
-Day.DILLUNS o  Day['DILLUNS']
-
-type(Day)				# <class 'enum.EnumMeta'>
-type(Day.DILLUNS)		# <enum 'Day'>
 ```
+* Cada membre de l'enum es declara amb majúscules i els valor de cada membre és una constant.
 
-Estacions.__members__.items() és un iterable on cada element és un tupla de dos elements. El primer element és una cadena amb el nom del membre de l'enum, i el segon és el propi enum (de tipus enum).
+* Podem accedir a l'enumerat per nom i per valor (el primer valor)
 
 ```python
-for item in Estacions.__members__.items():
-    print(item, type(item))
-
-('PRIMAVERA', <Estacions.PRIMAVERA: 1>) <class 'tuple'>
-('ESTIU', <Estacions.ESTIU: 2>) 		
-('TARDOR', <Estacions.TARDOR: 3>) 		
-('HIVERN', <Estacions.HIVERN: 4>) 		
+    Day.DILLUNS o  Day['DILLUNS']
+    Day(2)                          # Day.DIMARTS
 ```
 
 ```python
-for clau, valor in Estacions.__members__.items():
-    print(clau, valor.value, type(valor))
-
-PRIMAVERA 	1 	<enum 'Estacions'>
-ESTIU 		2 	
-TARDOR 		3 	
-HIVERN 		4 	
+    type(Day)		    # <class 'enum.EnumType'>
+    type(Day.DILLUNS	# <enum 'Day'>
 ```
 
-list(Day) crea una llista amb els membres de l'enum:
+```python
+for item in Day:
+    print(item.name, item.value, type(item.name),type(item.value))
+
+DILLUNS 1 <class 'str'> <class 'int'>
+DIMARTS 2 <class 'str'> <class 'int'>
+DIMECRES 3 <class 'str'> <class 'int'>
+DIJOUS 4 <class 'str'> <class 'int'>
+DIVENDRES 5 <class 'str'> <class 'int'>
+DISSABTE 6 <class 'str'> <class 'int'>
+DIUMENGE 7 <class 'str'> <class 'int'>		
+```
+
+____list()__ crea una llista amb els membres de l'enum:
 
 ```python
-[<Day.DILLUNS: 1>, <Day.DIMARTS: 2>, <Day.DIMECRES: 3>, <Day.DIJOUS: 4>, <Day.DIVENDRES: 5>, <Day.DISSABTE: 6>, <Day.DIUMENGE: 7>]
-
-llista[1]			Day.DIMARTS 	<enum 'Day'>
-llista[1].value		2				int
+llista = list(Day)
+print(llista[0],llista[0].name, llista[0].value, type(llista[0]))   # Day.DILLUNS    DILLUNS    1     <enum 'Day'>
 ```
 
 El normal és que el valor dels membres de l'enum siguen tot del mateix tipus.
@@ -74,6 +70,7 @@ class Grade(Enum):
 	D = 60
 	F = 0
 ```
+
 ```python
 class Talla(Enum):
 	S = 'small'
@@ -81,6 +78,7 @@ class Talla(Enum):
 	L = 'large'
 	XL = 'extra large'
 ```
+
 ```python
 class Switch(Enum):
 	ON = True
@@ -88,6 +86,7 @@ class Switch(Enum):
 ```
 
 Podem crear enumerats buits. 
+
 Els enumerats no permeten ser heretats excepte en el cas de que estiguen buits. Encara que un enumerat estiga buit permet que es creen mètodes.
 Aleshores, podem crear una jerarquia de classes enum que reutilitzen al funcionalitat d’estos mètodes.
 

@@ -299,11 +299,4 @@ except Exception as e:
     import traceback
     traceback.print_exception(type(e), e, e.__traceback__)
 
-https://www.qodo.ai/blog/6-best-practices-for-python-exception-handling/
-https://docs.python.org/3/reference/simple_stmts.html#raise
-https://realpython.com/python-lbyl-vs-eafp/
-https://realpython.com/python-raise-exception/
-
-
-
 
