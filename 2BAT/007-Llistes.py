@@ -417,6 +417,10 @@ print(s)
 b = sum(sum(llista,[]))
 print(b)
 
+# 6
+res = []
+for x in llista:
+    res += x
 
 # ---------------------------
 # FUNCIONAMENT DE SUM:

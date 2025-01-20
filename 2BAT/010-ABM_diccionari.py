@@ -91,11 +91,9 @@ try:
     with open(nom_arxiu, 'rb') as fd1:
         qualificacions = pickle.load(fd1)
 except FileNotFoundError:
-    with open(nom_arxiu, 'wb') as fd2:
-        pickle.dump(qualificacions, fd2)
-
-print(fd1)
-
+    pass
+    # with open(nom_arxiu, 'wb') as fd2:
+    #     pickle.dump(qualificacions, fd2)
 
 while True:
 

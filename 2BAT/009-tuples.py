@@ -78,7 +78,12 @@ dades = {'t': [30, 35, 37, 38], 'p': [800, 900, 1200, 1800], 's': [2,4,6,8]}
 # -----------------
 # Solucio 3
 # n = len(next(iter(dades.values())))
+
 # n = len(list(dades.values())[0])
+
+# a, *resta = dades.values()
+# n = len(a)
+
 
 # res = [[] for _ in range(n)]
 
