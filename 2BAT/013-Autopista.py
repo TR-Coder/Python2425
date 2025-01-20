@@ -27,7 +27,6 @@ class Persona_ja_està_en_cotxe(Exception):
 class Persona_no_este_cotxe(Exception):
     pass
 
-
 #==================================================================================
 class Autopista:
     def __init__(self) -> None:
@@ -114,18 +113,21 @@ print(a7)
 #==================================================================================
 
 class Persona:
-    _instancia:dict[str,Persona] = {}         # Diccionari per a emmagatzemar instàncies.
+    _instancia:dict[str,Persona] = {}               # Diccionari per a emmagatzemar instàncies.
 
     def __new__(cls, dni: str, *args, **kwargs):
-        if dni in cls._instancia:           # Si ja existeix una instància amb el mateix dni, es retorna l'existent.
-            return cls._instancia[dni]
+        if dni in cls._instancia:                   # Si ja existeix una instància amb el mateix dni, es retorna l'existent.
+            instancia_vella = cls._instancia[dni]
+            instancia_vella._es_una_nova_instancia = False       # type: ignore[attr-defined]
+            return instancia_vella
         
-        instancia = super().__new__(cls)    # Si no existix, es crea una nova instància
-        cls._instancia[dni] = instancia     # Guarda la nova instància
-        return instancia
+        instancia_nova = super().__new__(cls)    # Si no existix, es crea una nova instància
+        instancia_nova._es_una_nova_instancia = True                 # type: ignore[attr-defined]
+        cls._instancia[dni] = instancia_nova     # Guarda la nova instància
+        return instancia_nova
 
     def __init__(self, dni: str) -> None:
-        if hasattr(self, 'dni'): # Comprovació per a evitar la reinicialització d'atributs.
+        if not self._es_una_nova_instancia:                          # type: ignore[attr-defined]
             return
         self.dni = dni
 
@@ -134,8 +136,8 @@ class Persona:
         return list(cls._instancia.values())  # Retorna totes les instàncies creades.
 
     def __del__(self):
-        if self.dni in self._registre:         # Eliminem la instància quan es destruix.
-            del self._registre[self.dni]
+        if self.dni in self._instancia:         # Eliminem la instància quan es destruix.
+            del self._instancia[self.dni]
 
 # PROBLEMA: Python no garantix quan es cride a __del__ ja que això depén de recolector
 # de brossa. Ni tan sols si eliminen un objecte explícitament un 'del'.
