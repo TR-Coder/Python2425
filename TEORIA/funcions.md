@@ -330,3 +330,285 @@ f(1,2,3,4,c=5)			# 1 2 (3, 4) 5 {}
 f(1,2,3,4,c=5,d=6)		# 1 2 (3, 4) 5 {'d': 6}
 ```
 
+# Arguments per defecte d'objectes mutables
+Els arguments per defecte d'una funció es calculen i assignen només una vegada, en el moment en què es defineix la funció,
+no cada vegada que es crida. Això és especialment rellevant quan l'argument per defecte és un objecte mutable com una llista o un diccionari.
+Això pot portar a comportaments inesperats si es modifica este valor mutable, ja que el canvi es manté per a totes les cridades futures.
+Per exemple: 
+
+```python
+def afegir_element(llista=[]):
+    llista.append(1)
+    return llista
+
+# Crides a la funció:
+print(afegir_element())  # [1]
+print(afegir_element())  # [1, 1]
+print(afegir_element())  # [1, 1, 1]
+```
+
+Per evitar este comportament, s'utilitza None com a valor per defecte i crea l'objecte dins de la funció.
+
+```python
+def afegir_element(llista=None):
+    if llista is None:
+        llista = []  # Crear una llista nova
+    llista.append(1)
+    return llista
+
+# Crides a la funció:
+print(afegir_element())     # [1]
+print(afegir_element())     # [1]
+print(afegir_element([10])) # [10, 1]
+```
+
+# Programació funcional
+Podem assignar una funció a una variable i usar esta variable com si fóra la pròpia funció.
+```python
+    a = funcio()
+    a()
+```
+
+Podem passar una funció a una altra funció.
+```python
+    def interior():
+        print('interior')
+    
+    def exterior(f):
+        f()
+    
+    exterior(interior)
+```
+
+## Funcions lambda
+La sintaxi d'una expressió lambda és:
+    lambda <parameter_list>: <expression>
+
+Per exemple:
+```python
+
+f1 = lambda s: s[::-1]                          # 1 argument
+f2 = lambda x1, x2, x3: (x1 + x2 + x3) / 3      # n arguments
+
+animals = ["ferret", "vole", "dog", "gecko"]
+res1 = sorted(animals)
+res2 = sorted(animals, key=len)
+res3 = sorted(animals, key=lambda x: -len(x))
+
+b1 = lambda x: "parell" if x % 2 == 0 else "imparell"
+t2 = lambda x: (x, x ** 2, x ** 3)                      # retorna múltiples valors
+```
+
+## map()
+La sintaxi de la funció map és:
+    map(<f>, <iterable>)
+
+map s'aplica sobre un iterable i retorna un iterador. Quan recorrem este iterador
+que fa yield al resultat d'aplicar la funció f sobre cada element de l'iterable.
+Realment, retorma un map objet el qual és un iterator. Per a obtindre els valots de
+l'iterador cal iterar sobre ell o fer un list().
+
+```python
+animals = ["cat", "dog", "hedgehog", "gecko"]
+it = map(reverse, animals)
+
+for animal in it:
+    print(animal)
+
+list(it)      ['tac', 'god', 'gohegdeh', 'okceg']
+```
+
+Exemples:
+
+```python
+# Quan usem str.join() l'iterable que es concatena ha de ser un string,
+# per la qual cosa no podem fer directament un:
+
+"+".join([1, 2, 3, 4, 5])
+
+# Una solució seria:
+cadena1 = "+".join(map(str, [1, 2, 3, 4, 5]))
+
+# Encara que correcta, en Python es preferix usar les llistes de compressió:
+cadena2 = '+'.join((str(e) for e in [1,2,3,4,5]))
+```
+
+```python
+def quadrat(n):
+    return n*n
+    
+squared1 = map(quadrat, [1,2,3,4,5])
+print(list(squared))
+
+# o
+squared2 = map(lambda n: n*n, [1,2,3,4,5])
+```
+
+```python
+str_nums = ["4", "8", "6", "5", "3", "2", "8", "9", "2", "5"]
+int_nums = map(int, str_nums)
+```
+
+```python
+numbers = [-2, -1, 0, 1, 2]
+abs_values = list(map(abs, numbers))
+float_values = list(map(float, numbers))
+
+words = ["Welcome", "to", "Real", "Python"]
+len_values = list(map(len, words))
+```
+
+
+Podem utilitzar map amb múltiples iterabes. Aleshores, la funció de transformació
+ha de prendre tants arguments com iterables. Cada iteració de map() passarà un valor
+de cada iterable com a argument per a la funció. La iteració s'atura al final de l'iterable més curt.
+Exemples:
+
+```python
+base = [1, 2, 3]
+exponent = [4, 5, 6, 7]
+print(list(map(pow, base, exponent)))   # [1, 32, 729]
+
+
+print(list(map(lambda x, y: x - y, [2, 4, 6], [1, 3, 5])))  # [1, 1, 1]
+
+string_it = ["processing", "strings", "with", "map"]
+print(list(map(str.upper, string_it)))                # ['Processing', 'Strings', 'With', 'Map']
+```
+
+## Filter
+La funció filter() filtra elements d'un iterable segons una funció condicional que retorna True o False.
+Només els elements que complixen la condició (per als quals la funció retorna True) es mantenen.
+
+```python
+import math
+
+def is_positive(num):
+    return num >= 0
+
+numbers = [25, 9, 81, -16, 0]
+res = filter(is_positive, numbers)
+print(list(res))                    # [25, 9, 81, 0]
+```
+
+
+Podem combinar filter i map:
+
+```python
+import math
+
+def is_positive(num):
+    return num >= 0
+
+def sanitized_sqrt(numbers):
+    cleaned_iter = map(math.sqrt, filter(is_positive, numbers))
+    return list(cleaned_iter)
+
+res = sanitized_sqrt([25, 9, 81, -16, 0])
+print(list(res))
+```
+
+https://realpython.com/python-map-function/#using-map-with-different-kinds-of-functions
+
+
+# Composició de funcions
+Un exemple de composició de dos funcions és g(f(x)). Una manera senzilla d'implementar està composició és:
+
+```python
+
+def f(x):
+    return 2*x
+
+def g(x):
+    return x+10
+
+def composicio(x):
+    return f(g(x))
+
+resultat = composicio(5)
+```
+
+Una altra manera, com vorem més versàtil, és definint una funció nova que combina dos o més funcions per crear una funció composta.
+```python
+def f(x):
+    return 2*x
+
+def g(x):
+    return x+10
+
+def composicio(g,f):
+    def interna(x:int):
+        return g(f(x))
+    return interna
+
+gf = compile(g,f)
+resultat = gf(5)
+```
+
+La funció 'composició' que acabem de definir només permet funcions d'un sol argument. La composició de 2 funcions amb múltiples arguments seria:
+
+```python
+def doble(a,b) -> float:
+    return (a+b)*2
+
+def avalua(x:float) -> str:
+    if x>=0:
+        return 'positiu'
+    return 'negatiu'
+
+def composicio(g,f):
+    def interna(*args, **kwargs) -> str:
+        return avalua(doble(*args, **kwargs))
+    return interna
+
+gf = composicio(avalua, doble)
+resultat = gf(1,2)
+```
+
+Si volem fer una composició de múltiples funcions podem fer:
+```python
+def saluda(nom, salutacio='Hola'):
+    return f'{salutacio} {nom}', {'modificador':'exclamació'}
+
+
+def emfasi(text, modificador='emfasi'):
+    print('-------',text,  modificador)
+    if modificador == 'exclamació':
+        print(f'{text}!!!')
+    else:
+        print(text)
+
+
+def composicio(*funcions):
+    def interna(*args, **kwargs):
+        arguments = args if args else ()            # Manté múltiples args en una tupla, però si només n'hi ha un, el tracta com a valor únic.
+        kw_arguments = kwargs if kwargs else {}     # Manté els kwargs per transmetre'ls a les funcions següents.
+        
+        for funcio in reversed(funcions):
+            if isinstance(arguments, tuple):                                                               # Si tenim múltiples valors de retorn...
+                arguments = funcio(*arguments, **kw_arguments) if arguments else funcio(**kw_arguments)    # ...passem els args i els kwargs.
+            else:
+                arguments = funcio(arguments, **kw_arguments)
+            
+            if arguments is None:
+                arguments = ()
+           
+            if isinstance(arguments, tuple) and arguments and isinstance(arguments[-1], dict):  # Si la funció retorna múltiples valors, però alguns són kwargs...
+                *arguments, kw_arguments = arguments                                            # ...separa els args dels kwargs retornats.
+        
+        return arguments if arguments else None         # Si hi ha un únic element, el retorna directament
+    
+    return interna
+
+gf = composicio(emfasi, saluda)
+gf('Pere', salutacio='Hello')
+
+```
+
+
+
+```python
+
+```
+
+
