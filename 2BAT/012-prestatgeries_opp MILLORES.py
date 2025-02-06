@@ -219,7 +219,7 @@ def busca_llibre_i_lleva_de_biblioteca(isbn:str) -> None:
     raise Llibre_no_esta_en_biblioteca
 
 # --------------------------------------------
-def info(msg_error:str|None) -> None:
+def info() -> None:
     print('Llibres sense ubicar:')
     print('--------------------')
     for llibre in llibres_sense_ubicar:
@@ -236,10 +236,6 @@ def info(msg_error:str|None) -> None:
         print(f"  {prestatgeria.id=}")
         for estant in prestatgeria.estants:
             print(f'    {estant}')
-
-    if msg_error is not None:
-        print(f'\n*** ERROR: {msg_error}: ')
-
 
 # --------------------------------------------
 # Opcions del menú
@@ -289,6 +285,7 @@ def afig_un_llibre_a_una_prestatgeria() -> None:
         try:
             prestatgeria.afig(llibre)
             esborra_de_llibres_sense_ubicar(llibre)
+            return
         except (Prestatgeria_sense_estants,Prestatgeria_plena) as e:
             print(e.missatge_error)
 
@@ -299,7 +296,8 @@ def busca_i_lleva_un_llibre_de_la_biblioteca() -> None:
             isbn = input_isbn()
             if isbn is None:
                 return
-            busca_llibre_i_lleva_de_biblioteca(isbn)       
+            busca_llibre_i_lleva_de_biblioteca(isbn)  
+            return     
         except (Llibre_no_esta_en_biblioteca, ISBN_incorrecte) as e:
             print(e.missatge_error)
 
@@ -325,6 +323,7 @@ def processa_menu(opcio:str)  -> None:
 def main() -> None:
     while True:
         Esborra_la_terminal()
+        info()
 
         print('\n====== MENÚ ======')
         print('1- Afig una prestatgeria nova a la biblioteca')
